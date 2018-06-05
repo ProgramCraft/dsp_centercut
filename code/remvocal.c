@@ -17,6 +17,8 @@ typedef unsigned int                uint32;
 bool			mInitialized = FALSE;
 //HANDLE			hMutexRunning = 0;
 
+#define trce	printf
+
 #define	kWindowSize	4096
 unsigned int bigbuf[0xa000];
 unsigned *mBitRev = (bigbuf + 0x800);
@@ -645,6 +647,7 @@ static unsigned int g_samplecount = 0;
 static char *g_whole_wav_data_ptr = NULL;
 static char *orien_pcm_ptr = NULL;
 static unsigned int g_orien_pcm_size = 0;
+static char *importFileName=NULL;
 #define START_ADDR	(0)//(44100*20*2*2)
 #define ALG_PROCESS_SAMPLE_NUM	512
 
@@ -653,7 +656,9 @@ int remvocal_init(void)
 	DWORD filesize, readsize;
 	FILE *pfile = NULL;
 
-	fopen_s(&pfile, "before_remvocal.wav", "r+b");
+	if(NULL == importFileName)
+		return 1;
+	fopen_s(&pfile, importFileName, "r+b");
 	fseek(pfile, 0, SEEK_END);
 	g_orien_pcm_size = filesize = ftell(pfile);
 	fseek(pfile, 0, 0);
@@ -721,10 +726,19 @@ int centercut_pcm_process(char *pcm_buf, int samples_num)
 	return 0;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
 	int ret;
 	
+	if(argc < 2){
+		trce("Usage :\n  ./remvocal wav_file_name\n");
+		return 0;
+	}
+	importFileName = argv[1];
+	if (strstr(importFileName, ".wav") == NULL && strstr(importFileName, ".WAV") == NULL) {
+        printf("Error: import file seems not to be a wav file \n");
+        return 0;
+    }
 	Init_CenterCut();
 	ret = remvocal_init();
 	if(!!ret)
@@ -733,7 +747,7 @@ int main()
 	flush_result_pcm();
 	remvocal_deinit();
 	Quit_CenterCut();
-	printf("done!\n");
+	trce("done!\n");
     return 0;
 }
 
