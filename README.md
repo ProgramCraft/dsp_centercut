@@ -2,5 +2,4 @@ alg from winmap plugin DSP_centercut.
 
 compiler:Visual Studio 2015.
 usage:
-	wave file: dsp_centercut\\dsp_centercut\\before_remvocal.wav
-	vocal will be deliminated from this wav file(generating output.pcm).
+	deliminate vocal from wav(generating output.pcm).
